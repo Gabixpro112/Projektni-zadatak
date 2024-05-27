@@ -1,99 +1,62 @@
 #include <iostream>
-#include <conio.h>
-#include <windows.h>
-
-#define WIDTH 20
-#define HEIGHT 20
-#define INVADER 'X'
-#define PLAYER '^'
-#define BULLET '|'
-
-void draw(char grid[HEIGHT][WIDTH])
-{
-    system("CLS");
-    for (int i = 0; i < HEIGHT; ++i)
-    {
-        for (int j = 0; j < WIDTH; ++j)
-        {
-            std::cout << grid[i][j];
-        }
-        std::cout << std::endl;
-    }
-}
+#include <thread>
+#include <chrono>
+#include <random>
+using namespace std;
 
 int main()
 {
-    char grid[HEIGHT][WIDTH] = {};
-    int playerPos = WIDTH / 2;
-    int bulletPos = -1;
+    char keys[] = {'W', 'A', 'S', 'D'};
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> dis(0, 3); // Randomly choose 0, 1, 2, or 3
+    uniform_int_distribution<> lengthDis(4, 10);
 
-    // Initialize the grid
-    for (int i = 0; i < HEIGHT; ++i)
-    {
-        for (int j = 0; j < WIDTH; ++j)
-        {
-            grid[i][j] = ' ';
-        }
-    }
-
-    // Place the player
-    grid[HEIGHT - 1][playerPos] = PLAYER;
+    int totalScore = 0;
+    const int MAX_TIME_SECONDS = 10; // Set the maximum time in seconds
 
     while (true)
     {
-        // Move the bullet
-        if (bulletPos != -1)
+        int sequenceLength = lengthDis(gen);
+
+        // Print the randomly generated sequence
+        cout << "Random sequence: ";
+        for (int i = 0; i < sequenceLength; ++i)
         {
-            for (int i = 0; i < WIDTH; ++i)
-            {
-                if (grid[bulletPos][i] == BULLET)
-                {
-                    grid[bulletPos][i] = ' ';
-                    if (bulletPos > 0)
-                    {
-                        grid[--bulletPos][i] = BULLET;
-                    }
-                    else
-                    {
-                        bulletPos = -1;
-                    }
-                }
+            int randomIndex = dis(gen); // Moved inside the loop
+            cout << keys[randomIndex] << " ";
+        }
+        cout << endl;
+
+        // Get user input
+        cout << "Enter your sequence (W, A, S, D): ";
+        string userInput;
+        cin >> userInput;
+
+        // Check user input against the generated sequence
+        int score = 0;
+        for (int i = 0; i < sequenceLength; ++i)
+        {
+            if (i >= userInput.length() || userInput[i] != keys[randomIndex])
+            { // Fixed randomIndex usage
+                cout << "Invalid input or timeout. Timer expired!" << endl;
+                return 0;
             }
+            ++score;
         }
 
-        // Get the user's input
-        if (_kbhit())
-        {
-            switch (_getch())
-            {
-            case 'a':
-                if (playerPos > 0)
-                {
-                    grid[HEIGHT - 1][playerPos] = ' ';
-                    grid[HEIGHT - 1][--playerPos] = PLAYER;
-                }
-                break;
-            case 'd':
-                if (playerPos < WIDTH - 1)
-                {
-                    grid[HEIGHT - 1][playerPos] = ' ';
-                    grid[HEIGHT - 1][++playerPos] = PLAYER;
-                }
-                break;
-            case ' ':
-                if (bulletPos == -1)
-                {
-                    bulletPos = HEIGHT - 2;
-                    grid[bulletPos][playerPos] = BULLET;
-                }
-                break;
-            default:
-                break;
-            }
-        }
+        // Extend the timer based on user input
+        this_thread::sleep_for(chrono::seconds(2)); // Extend timer by 2 seconds
+        cout << "Timer extended!" << endl;
+        cout << "Your score for this sequence: " << score << "/" << sequenceLength << endl;
+        totalScore += score;
 
-        draw(grid);
-        Sleep(100);
+        // Check if the total time has exceeded the maximum allowed time
+        if (totalScore >= MAX_TIME_SECONDS)
+        {
+            cout << "Time's up! Total score: " << totalScore << endl;
+            break; // Exit the loop
+        }
     }
 
     return 0;
