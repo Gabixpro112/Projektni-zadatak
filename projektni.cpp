@@ -156,6 +156,7 @@ int main()
                 cout << "Round " << runda << ": " << randomString << endl;
 
                 int index = 0;
+                rezultat = 0;
                 bool mistakeMade = false;
 
                 while (index < randomString.size())
