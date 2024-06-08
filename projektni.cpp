@@ -6,25 +6,37 @@
 #include <mutex>
 #include <vector>
 #include <algorithm>
+#include <condition_variable>
 
 using namespace std;
 
-bool timeUp = false; // Global flag to indicate if the time is up
-mutex mtx;           // Mutex to protect shared resources
+bool timeUp = false;   // Global flag to indicate if the time is up
+mutex mtx;             // Mutex to protect shared resources
+condition_variable cv; // Condition variable for the countdown
+int remainingTime;     // Remaining time for the countdown
 
-void countdown(int seconds)
+void countdown()
 {
-    while (seconds > 0)
+    unique_lock<mutex> lock(mtx);
+    while (remainingTime > 0)
     {
+        cv.wait_for(lock, std::chrono::seconds(1));
+        --remainingTime;
 
-        this_thread::sleep_for(std::chrono::seconds(1));
-        --seconds;
-    }
-    {
-        lock_guard<mutex> lock(mtx);
-        timeUp = true; // Set the flag when the time is up
+        if (remainingTime <= 0)
+        {
+            timeUp = true;
+            break;
+        }
     }
     cout << "\rTime's up!                \n"; // Extra spaces to overwrite the previous output
+}
+
+void addTime(int seconds)
+{
+    lock_guard<mutex> lock(mtx);
+    remainingTime += seconds;
+    cv.notify_all(); // Notify the countdown thread
 }
 
 void saveScore(const string &playerName, int score)
@@ -132,7 +144,8 @@ int main()
 
             // Start the countdown in a separate thread
             timeUp = false;
-            thread countdownThread(countdown, 20);
+            remainingTime = 20; // Initial time for the countdown
+            thread countdownThread(countdown);
             countdownThread.detach(); // Detach the countdown thread from the main thread
 
             int runda = 1;
@@ -172,7 +185,6 @@ int main()
                     {
                         cout << ch;
                         ++index; // Increment the index only when the correct key is pressed
-                        rezultat += 5;
                     }
                     else
                     {
@@ -189,7 +201,9 @@ int main()
                 }
 
                 cout << "\nRound done" << endl;
+                rezultat += 5;
                 ++runda;
+                addTime(2); // Add 2 seconds for each round completed
             }
 
             cout << "Game over! Your final score is: " << rezultat << endl;
