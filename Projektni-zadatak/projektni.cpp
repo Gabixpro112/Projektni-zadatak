@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <chrono>
 #include <thread>
@@ -7,7 +8,7 @@
 #include <vector>
 #include <algorithm>
 #include <condition_variable>
-
+#include <cstdlib>
 using namespace std;
 
 bool timeUp = false;   // Global flag to indicate if the time is up
@@ -131,6 +132,7 @@ int main()
 
         if (unos == 1)
         {
+            system("start test.wav");
             string playerName;
             cout << "Unesite svoje ime" << endl;
             cin >> playerName;
