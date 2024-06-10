@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <chrono>
 #include <thread>
@@ -7,7 +8,7 @@
 #include <vector>
 #include <algorithm>
 #include <condition_variable>
-
+#include <cstdlib>
 using namespace std;
 
 bool timeUp = false;   // Global flag to indicate if the time is up
@@ -138,7 +139,7 @@ int main()
             outFile << playerName << endl;
             outFile.close();
             cout << "Hit all the keys in the correct order" << endl;
-            int rezultat = 0;
+            int rezultat = -5;
             srand(time(0)); // Initialize random number generator.
             const char keys[] = {'w', 'a', 's', 'd'};
 
@@ -197,7 +198,7 @@ int main()
 
                 if (!mistakeMade)
                 {
-                    rezultat += 10; // Bonus points for no mistakes
+                    rezultat += 5; // Bonus points for no mistakes
                 }
 
                 cout << "\nRound done" << endl;
