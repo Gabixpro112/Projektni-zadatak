@@ -132,7 +132,6 @@ int main()
 
         if (unos == 1)
         {
-            system("start test.wav");
             string playerName;
             cout << "Unesite svoje ime" << endl;
             cin >> playerName;
@@ -140,7 +139,7 @@ int main()
             outFile << playerName << endl;
             outFile.close();
             cout << "Hit all the keys in the correct order" << endl;
-            int rezultat = 0;
+            int rezultat = -5;
             srand(time(0)); // Initialize random number generator.
             const char keys[] = {'w', 'a', 's', 'd'};
 
@@ -199,7 +198,7 @@ int main()
 
                 if (!mistakeMade)
                 {
-                    rezultat += 10; // Bonus points for no mistakes
+                    rezultat += 5; // Bonus points for no mistakes
                 }
 
                 cout << "\nRound done" << endl;
